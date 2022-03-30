@@ -13,7 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import com.example.domain.Board;
+import com.example.domain.QBoard;
 import com.example.persistence.BoardRepository;
+import com.querydsl.core.BooleanBuilder;
 
 @SpringBootTest
 class Boot03ApplicationTests {
@@ -112,5 +114,32 @@ class Boot03ApplicationTests {
 	public void testByPaging() {
 		Pageable pageable = PageRequest.of(0, 10); // new PageRequest - deprecated
 		repo.findBypage(pageable).forEach(board -> System.out.println(board));
+	}
+	
+	@Test
+	public void testPredicate() {
+		String type = "t";
+		String keyword = "17";
+		
+		BooleanBuilder builder = new BooleanBuilder();
+		QBoard board = QBoard.board;
+		
+		if(type.equals("t")) {
+			builder.and(board.title.like("%"+keyword+"%"));
+		}
+		
+		builder.and(board.bno.gt(0L));
+		Pageable pageable  = PageRequest.of(0, 10);
+		
+		Page<Board> result = repo.findAll(builder, pageable);
+		System.out.println("PAGE SIZE: " + result.getSize());
+		System.out.println("TOTAL PAGES: " + result.getTotalPages());
+		System.out.println("TOTAL COUNT: " + result.getTotalElements());
+		System.out.println("NEXT: " + result.nextPageable());
+		
+		List<Board> list = result.getContent();
+		list.forEach(b -> System.out.println(b));
+
+		
 	}
 }
