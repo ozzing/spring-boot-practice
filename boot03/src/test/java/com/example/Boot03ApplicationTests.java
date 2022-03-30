@@ -1,5 +1,6 @@
 package com.example;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -37,11 +38,11 @@ class Boot03ApplicationTests {
 		repo.findBoardByTitle("제목...177").forEach(board -> System.out.println(board));
 	}
 	
-	@Test
-	public void testByWriter() {
-		Collection<Board> results = repo.findByWriter("user00");
-		results.forEach(board -> System.out.println(board));
-	}
+//	@Test
+//	public void testByWriter() {
+//		Collection<Board> results = repo.findByWriter("user00");
+//		results.forEach(board -> System.out.println(board));
+//	}
 	
 	@Test
 	public void testByWriterContaining() {
@@ -80,5 +81,36 @@ class Boot03ApplicationTests {
 		
 		List<Board> list = result.getContent();
 		list.forEach(board -> System.out.println(board));
+	}
+	
+	@Test
+	public void testByTitle2() {
+		repo.findByTitle("17").forEach(board -> System.out.println(board));
+	}
+	
+	@Test
+	public void testByContent() {
+		repo.findByContent("17").forEach(board -> System.out.println(board));
+	}
+	
+	@Test
+	public void testByWriter() {
+		repo.findByWriter("user00").forEach(board -> System.out.println(board));
+	}
+	
+	@Test
+	public void testByTitle17() {
+		repo.findByTitle2("17").forEach(arr -> System.out.println(Arrays.toString(arr)));
+	}
+
+	@Test
+	public void testByTitle18() {
+		repo.findByTitle3("18").forEach(arr -> System.out.println(Arrays.toString(arr)));
+	}
+	
+	@Test
+	public void testByPaging() {
+		Pageable pageable = PageRequest.of(0, 10); // new PageRequest - deprecated
+		repo.findBypage(pageable).forEach(board -> System.out.println(board));
 	}
 }
