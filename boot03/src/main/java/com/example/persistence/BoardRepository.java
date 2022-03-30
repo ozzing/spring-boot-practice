@@ -3,6 +3,7 @@ package com.example.persistence;
 import java.util.Collection;
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 
 import com.example.domain.Board;
@@ -19,6 +20,8 @@ public interface BoardRepository extends CrudRepository<Board, Long>{
 	
 	public Collection<Board> findByTitleContainingAndBnoGreaterThan(String keyword, Long num);
 	
-	public Collection<Board> findByBnoGreaterThanOrderByBnoDesc(Long bno);
+	public List<Board> findByBnoGreaterThanOrderByBnoDesc(Long bno, Pageable paging);
+	
+	public List<Board> findByBnoGreaterThan(Long bno, Pageable paging);
 	
 }

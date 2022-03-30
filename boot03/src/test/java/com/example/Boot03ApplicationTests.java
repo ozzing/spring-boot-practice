@@ -5,6 +5,9 @@ import java.util.Collection;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import com.example.domain.Board;
 import com.example.persistence.BoardRepository;
@@ -57,8 +60,16 @@ class Boot03ApplicationTests {
 	}
 	
 	@Test
-	public void testBnoOrderBy() {
-		Collection<Board> results = repo.findByBnoGreaterThanOrderByBnoDesc(90L);
+	public void testBnoOrderByPaging() {
+		Pageable paging = PageRequest.of(0, 10);
+		Collection<Board> results = repo.findByBnoGreaterThanOrderByBnoDesc(0L, paging);
+		results.forEach(board -> System.out.println(board));
+	}
+	
+	@Test
+	public void testBnoPagingSort() {
+		Pageable paging = PageRequest.of(0, 10, Sort.Direction.ASC, "bno");
+		Collection<Board> results = repo.findByBnoGreaterThan(0L, paging);
 		results.forEach(board -> System.out.println(board));
 	}
 }
