@@ -1,5 +1,7 @@
 package com.example;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.IntStream;
 
 import org.junit.Test;
@@ -55,5 +57,17 @@ public class ProfileTests{
 			profile1.setMember(member);
 			profileRepo.save(profile1);
 		}
+	}
+	
+	@Test
+	public void testFetchJoin1() {
+		List<Object[]> result = memberRepo.getMemberWithProfileCount("user1");
+		result.forEach(arr -> System.out.println(Arrays.toString(arr)));
+	}
+	
+	@Test
+	public void testFetchJoin2() {
+		List<Object[]> result = memberRepo.getMemberWithProfile("user1");
+		result.forEach(arr -> System.out.println(Arrays.toString(arr)));
 	}
 }
