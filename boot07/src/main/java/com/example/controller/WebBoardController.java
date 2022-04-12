@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.domain.WebBoard;
+import com.example.persistence.CustomCrudRepository;
 import com.example.persistence.WebBoardRepository;
 import com.example.vo.PageMaker;
 import com.example.vo.PageVO;
@@ -26,13 +27,13 @@ import lombok.extern.java.Log;
 public class WebBoardController{
 	
 	@Autowired
-	private WebBoardRepository repo;
+	private CustomCrudRepository repo;
 	
 	@GetMapping("/list")
 	public void list(@ModelAttribute("pageVO") PageVO vo, Model model) {
 		Pageable page = vo.makePageable(0, "bno");
 		
-		Page<WebBoard> result = repo.findAll(repo.makePredicate(vo.getType(), vo.getKeyword()), page);
+		Page<Object[]> result = repo.getCustomPage(vo.getType(), vo.getKeyword(), page);
 		
 		log.info("" + page);
 		log.info("" + result);
