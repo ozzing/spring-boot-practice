@@ -1,7 +1,8 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
- layout:decorate="~{/layout/layout1}"></html>
+ layout:decorate="~{/layout/layout1}">
 
 <div layout:fragment="content">
+<form th:action="${'/login'}"></form>
 	<div class="panel-heading">View Page</div>
 	<div class="panel-body">
 		<div class="form-group">
@@ -58,7 +59,7 @@
 						<label>Reply Text</label>
 						<input type="text" class="form-control" name='replyText'>
 						<label>Replyer</label>
-						<input type="text" class="form-control" name='replyer'>
+						<input type="text" class="form-control" name='replyer' readonly="readonly">
 					</div>
 					<div class="modal-footer">
 						<button id='delModalBtn' class="btn btn-danger">Delete</button>
@@ -71,13 +72,14 @@
 	</div>
 </div>
 
-<th: block layout:fragment="script">
+<th:block layout:fragment="script">
 	<script th:inline="javascript" th:src="@{'/js/reply.js'}"></script>
 	<script th:inline="javascript">
 	$(document).ready(function (e){
 		(function(){
 			replyManager.getAll([[${vo.bno}]], printList);
 		})();
+
 		
 		function printList(list){
 			var str = "";
@@ -102,14 +104,6 @@
 		
 		var mode;
 		
-		$("#addReplyBtn").on('click', function(){
-			$("#delModalBtn").hide();
-			$("#myModal").modal("show");
-			$(".modal-title").text("Add Reply");
-			
-			mode="ADD";
-		});
-		
 		var bno = [[${vo.bno}]];
 		
 		var replyTextObj = $("input[name='replyText']");
@@ -122,31 +116,11 @@
 			replyerObj.val("");
 		}
 		
-		$("#modalBtn").click(function(){
-			var replyText = replyTextObj.val();
-			var replyer = replyerObj.val();
-			
-			if(mode == 'ADD'){	
-				var obj = {replyText:replyText, replyer: replyer, bno:bno};
-				
-				replyManager.add(obj, function(list){
-					alert("새로운 댓글이 추가되었습니다.");
-					afterAll(list);
-				});
-			}
-			else if(mode == 'MOD'){
-				var obj = {replyText:replyText, bno:bno, rno:rno};
-				
-				replyManager.update(obj, function(list){
-					alert("댓글이 수정되었습니다.");
-					afterAll(list);
-				});
-			}
-		});
-		
 		var rno;
 		$("#replyTable").on("click", "tr", function(e){
 			$("#delModalBtn").show();
+			$("#modalBtn").show();
+			
 			var tds = $(this).find('td');
 			console.log(tds);
 			
@@ -157,20 +131,17 @@
 			replyerObj.val(tds[2].innerHTML);
 			$("#myModal").modal("show");
 			$(".modal-title").text("Modify/Delete Reply");
+			
+			if(uid != tds[2].innerHTML.trim()){
+				$("#delModalBtn").hide();
+				$("#modalBtn").hide();
+			}
 		});
 		
-		$("#delModalBtn").on("click", function(){
-			var obj = {bno:bno, rno:rno};
-			replyManager.remove(obj, function(list){
-				printList(list);
-				alert("댓글이 삭제되었습니다.");
-				$("#myModal").modal("hide");
-				replyTextObj.val("");
-				replyerObj.val("");
-			});
-		});	
 		
 		var uid=[[${#authentication.principal} eq 'anonymousUser'? null: ${#authentication.principal.member.uid}]];
+
+		var csrf = JSON.parse('[[${_csrf}]]');
 		
 		$("#goModBtn").click(function(e){
 			e.preventDefault();
@@ -186,6 +157,53 @@
 				else{
 					alert("작성자만이 수정이나 삭제할 수 있습니다.");
 				}
+			}
+		});
+		
+		$("#addReplyBtn").on('click', function(){
+			if(uid == null){
+				if(confirm("로그인할까요?")){
+					self.location = [[@{/login}]];
+				}
+				return;
+			}
+			
+			replyerObj.val(uid);
+			$("#myModal").modal("show");
+			$(".modal-title").text("Add Reply");
+			
+			$("#delModalBtn").hide();
+			mode="ADD";
+		});
+		
+		$("#delModalBtn").on("click", function(){
+			var obj = {bno:bno, rno:rno, csrf:csrf};
+			replyManager.remove(obj, function(list){
+				printList(list);
+				alert("댓글이 삭제되었습니다.");
+				afterAll(list);
+			});
+		});			
+		
+		$("#modalBtn").click(function(){
+			var replyText = replyTextObj.val();
+			var replyer = replyerObj.val();
+			
+			if(mode == 'ADD'){	
+				var obj = {replyText:replyText, replyer: replyer, bno:bno, csrf:csrf};
+				
+				replyManager.add(obj, function(list){
+					alert("새로운 댓글이 추가되었습니다.");
+					afterAll(list);
+				});
+			}
+			else if(mode == 'MOD'){
+				var obj = {replyText:replyText, bno:bno, rno:rno, csrf:csrf};
+				
+				replyManager.update(obj, function(list){
+					alert("댓글이 수정되었습니다.");
+					afterAll(list);
+				});
 			}
 		});
 	});
