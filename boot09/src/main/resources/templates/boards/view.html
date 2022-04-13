@@ -147,7 +147,7 @@
 			e.preventDefault();
 			if(uid == null){
 				if(confirm("로그인할까요?")){
-					self.location = $(this).attr('href');
+					self.location = [[@{/login}]]+"?dest=" + encodeURIComponent(self.location);
 				}
 			}
 			else{
@@ -163,7 +163,7 @@
 		$("#addReplyBtn").on('click', function(){
 			if(uid == null){
 				if(confirm("로그인할까요?")){
-					self.location = [[@{/login}]];
+					self.location = [[@{/login}]]+"?dest=" + encodeURIComponent(self.location);
 				}
 				return;
 			}

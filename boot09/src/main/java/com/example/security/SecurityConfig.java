@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		http.authorizeRequests()
 		.antMatchers("/boards/list").permitAll()
 		.antMatchers("/boards/register").hasAnyRole("BASIC", "MANAGER", "ADMIN");
-		http.formLogin().loginPage("/login");
+		http.formLogin().loginPage("/login").successHandler(new LoginSuccessHandler());
 		http.exceptionHandling().accessDeniedPage("/accessDenied");
 		http.logout().logoutUrl("/logout").invalidateHttpSession(true);
 		http.rememberMe().key("example").userDetailsService(exampleUsersService).tokenRepository(getJDBCRepository()).tokenValiditySeconds(60*60*24);
